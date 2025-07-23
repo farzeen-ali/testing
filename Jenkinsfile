@@ -5,12 +5,13 @@ pipeline {
         CONTAINER_NAME = "nestjs-app"
         IMAGE_NAME = "nestjs-image"
         EMAIL = "techzeen10@gmail.com"
+        PORT = "3000"
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/farzeen-ali/testing'
+                git branch: 'main', url: 'https://github.com/farzeen-ali/testing'
             }
         }
 
@@ -23,8 +24,8 @@ pipeline {
         stage('Stop & Remove Previous Container') {
             steps {
                 sh '''
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
                 '''
             }
         }
@@ -32,7 +33,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 sh '''
-                docker run -d -p 3000:3000 --name $CONTAINER_NAME $IMAGE_NAME
+                    docker run -d -p ${PORT}:${PORT} --name $CONTAINER_NAME $IMAGE_NAME
                 '''
             }
         }
@@ -41,7 +42,7 @@ pipeline {
             steps {
                 emailext (
                     subject: "✅ NestJS App Deployed Successfully on EC2",
-                    body: "NestJS app is running on EC2 at: http://<your-ec2-ip>:3000",
+                    body: "🚀 Your NestJS app is now live at: http://<your-ec2-public-ip>:${PORT}",
                     to: "${EMAIL}"
                 )
             }
